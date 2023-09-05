@@ -1,24 +1,49 @@
-import logo from './logo.svg';
-import './App.css';
+import { Route, Routes } from "react-router-dom";
+import GlobalStyle from "./component/GlobalStyle";
+import Main from "./pages/Main";
+import Detail from "./pages/Detail";
+import Aside from "./component/Aside";
+import { ThemeProvider } from "styled-components";
+import { useState } from "react";
+// import Example from "./pages/Example";
+// import Example2 from "./pages/Example2";
+// import Example3 from "./pages/Example3";
+
+
 
 function App() {
+  const light = {
+    colors: {
+      Primary: "orange",
+      Secondary: "orangered"
+    }
+  }
+  const dark = {
+    colors: {
+      Primary: "#272929",
+      Secondary: "#e9e9e9"
+    }
+  }
+  const [themeConfig, setThemeConfig] = useState("light")
+  
+  const DarkMode = themeConfig === 'light' ? light : dark
+  const ThemeSelect = ()=>{
+    setThemeConfig(themeConfig === 'light' ? "dark" : "light")
+  }
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <ThemeProvider theme={DarkMode}>
+        <GlobalStyle />
+        <Aside ThemeSelect={ThemeSelect} themeConfig={themeConfig}/>
+        <Routes>
+          <Route path="/" element={<Main />} />
+          {/* <Route path="/" element={<Example3 />} /> */}
+          <Route path="/detail" element={<Detail/>}/>
+        </Routes>
+      </ThemeProvider>
+    </>
   );
 }
 
