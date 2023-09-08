@@ -55,16 +55,10 @@ const Pagination = styled.div`
         border-radius: 5px;
         cursor: pointer;
         background-color: #fff;
+        padding: 5px 20px;
         &.on{
           background-color: yellowgreen;
-        }
-        &.on{
           color: #fff;
-        }
-        a{
-          display: inline-block;
-          width: 100%;
-          padding: 5px 20px;
         }
       }
   }
@@ -74,7 +68,7 @@ const Pagination = styled.div`
 
 function Main() {
   const [data, setData] = useState()
-
+  const [allData, setAllData] = useState()
   const list = 10
   const [page, setPage] = useState(1)
   const [totalCnt, setTotalCnt] = useState(0)
@@ -82,29 +76,59 @@ function Main() {
   const totalPage = Math.floor(totalCnt / list);
   const  [gugun, setGugun] = useState("전체")
 
+  let startPage;
+  let endPage;
+
+  const currentBlock = Math.ceil(page / pagination)
+  // ceil - 소숫점을 올림하여 없앰
+  // floor - 소숫점 내려서 없앰
+  startPage = (currentBlock - 1) * pagination + 1;
+  endPage = startPage + pagination - 1;
+
+  if(endPage > totalPage){
+    endPage = totalPage
+  }
+  const PrevBlock = () => {
+    if(startPage > 1){
+      setPage(startPage - pagination)
+    }
+  }
+  const NextBlock = () => {
+    if(endPage < totalPage){
+      setPage(startPage + pagination)
+    }
+  }
+
   const PageList = []
-  for(let i = 0; i < totalPage; i++){
+  for(let i = startPage; i <= endPage; i++){
     PageList.push(
-      <li key={i} className={(page === i+1 ? "on" : "")}>
-        <NavLink to='/'  onClick={()=>{setPage(i+1)}}>{i+1}</NavLink>
+      <li key={i} className={(page === i ? "on" : "")}  onClick={()=>{setPage(i)}}>
+        {i}
       </li>
     )
   }
 
   useEffect(()=>{
-    axios.get(`https://apis.data.go.kr/6260000/FestivalService/getFestivalKr?serviceKey=${process.env.REACT_APP_APIKEY}&pageNo=${page}&numOfRows=10&resultType=json`)
+    axios.get(`https://apis.data.go.kr/6260000/FestivalService/getFestivalKr?serviceKey=${process.env.REACT_APP_APIKEY}&pageNo=1&numOfRows=100&resultType=json`)
     .then(function(res){
       setData(res.data.getFestivalKr.item)
-      setTotalCnt(res.data.getFestivalKr.totalCount)
+      setTotalCnt(500);
     })
   }, [page])
+
+  useEffect(()=>{
+    axios.get(`https://apis.data.go.kr/6260000/FestivalService/getFestivalKr?serviceKey=${process.env.REACT_APP_APIKEY}&pageNo=1&numOfRows=100&resultType=json`)
+    .then(function(res){
+      setAllData(res.data.getFestivalKr.item)
+    })
+  }, [])
 
   const FilterData = data && data.filter(e=>{
     return gugun === '전체' || gugun === e.GUGUN_NM
   })
 
-  const FilterGugun = [...new Set(data && data.map(e=> e.GUGUN_NM))]
-  console.log(FilterGugun)
+  const FilterGugun = [...new Set(allData && allData.map(e=> e.GUGUN_NM))]
+  
 
   const Category = styled.div`
     width: 100%;
@@ -197,15 +221,9 @@ function Main() {
         </Content>
         <Pagination>
           <ul>
-            <li onClick={()=>{(page === 1 ? alert("더 이상 데이터가 없습니다.") : setPage(page-1))}}><NavLink to='/'>이전</NavLink></li>
-            {
-              data && PageList.map(e=>{
-                return(
-                  e
-                )
-              })
-            }
-            <li onClick={()=>{(page === totalPage ? alert("더 이상 데이터가 없습니다.") : setPage(page+1))}}><NavLink to='/'>다음</NavLink></li>
+            <li onClick={PrevBlock}>이전</li>
+            {PageList}
+            <li onClick={NextBlock}>다음</li>
           </ul>
         </Pagination>
     </>
