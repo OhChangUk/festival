@@ -109,10 +109,11 @@ function Main() {
   }
 
   useEffect(()=>{
-    axios.get(`https://apis.data.go.kr/6260000/FestivalService/getFestivalKr?serviceKey=${process.env.REACT_APP_APIKEY}&pageNo=1&numOfRows=100&resultType=json`)
+    axios.get(`https://apis.data.go.kr/6260000/FestivalService/getFestivalKr?serviceKey=${process.env.REACT_APP_APIKEY}&pageNo=${page}&numOfRows=10&resultType=json`)
     .then(function(res){
       setData(res.data.getFestivalKr.item)
-      setTotalCnt(500);
+      setTotalCnt(res.data.getFestivalKr.totalCount)
+
     })
   }, [page])
 
