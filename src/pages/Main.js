@@ -166,20 +166,11 @@ function Main() {
     
   `
   const [isActive, setIsActive] = useState(-1)
-  const [active, setActive] = useState(-1)
   
   return (
     <>
         <Content>
           <Category>
-          <div className={active === -1 ? "on" : ""} onClick={()=>{setActive(-1)}}>{`인덱스 번호 : -1`}</div>
-            {
-              data && Array(5).fill().map((e,i)=>{
-                return(
-                  <div className={active === i ? "on" : ""} onClick={()=>{setActive(i)}}>{e}{`인덱스 번호 : ${i}`}</div>
-                )
-              })
-            }
             <ul>
               <li className={isActive === -1 ? "on" : ""} onClick={()=>{setIsActive(-1); setGugun("전체")}}>전체</li>
               {
